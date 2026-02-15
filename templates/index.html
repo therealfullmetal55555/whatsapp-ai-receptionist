@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receptionist — WhatsApp</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #e8e2d5; color: #1a1a18; font-family: -apple-system, sans-serif; }
+.mono { font-family: ui-monospace, monospace; }
+.top { background: #1a1a18; color: #e8e2d5; padding: 12px 20px; display: flex; justify-content: space-between; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-family: ui-monospace, monospace; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; display: grid; grid-template-columns: 380px 1fr; gap: 32px; }
+.phone { background: #0a0a0a; border-radius: 36px; padding: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px #1a1a18; position: sticky; top: 24px; }
+.phone-notch { width: 100px; height: 24px; background: #0a0a0a; border-radius: 0 0 12px 12px; margin: 0 auto; position: relative; z-index: 2; }
+.phone-screen { background: #e5ddd5; border-radius: 24px; overflow: hidden; margin-top: -12px; padding-top: 24px; }
+.phone-header { background: #f0f0f0; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #d6d2c7; }
+.phone-header .avatar { width: 36px; height: 36px; background: #1a1a18; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.chat { height: 440px; overflow-y: auto; padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 50c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 32c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d6d2c7' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E"); }
+.msg { max-width: 78%; padding: 8px 12px; border-radius: 8px; font-size: 13px; line-height: 1.4; position: relative; }
+.msg.user { background: #dcf8c6; margin-left: auto; border-radius: 8px 0 8px 8px; box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
+.msg.bot { background: white; margin-right: auto; border-radius: 0 8px 8px 8px; box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
+.msg.system { background: #fff5c4; font-size: 11px; text-align: center; margin: 8px auto; max-width: 90%; border-radius: 6px; }
+.msg .time { font-size: 10px; color: #8a867e; margin-top: 4px; text-align: right; font-family: ui-monospace, monospace; }
+.phone-input { display: flex; gap: 8px; padding: 8px; background: #f0f0f0; align-items: center; }
+.phone-input input { flex: 1; padding: 10px 14px; border: none; border-radius: 20px; font-size: 14px; background: white; }
+.phone-input button { width: 36px; height: 36px; border-radius: 50%; border: none; background: #25D366; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px; background: #f0f0f0; border-top: 1px solid #e8e2d6; }
+.quick button { font-size: 11px; padding: 6px 10px; border-radius: 100px; border: 1px solid #d6d2c7; background: white; cursor: pointer; }
+.info { }
+.info h1 { font-family: Georgia, serif; font-size: 44px; line-height: 0.9; letter-spacing: -0.03em; font-weight: 400; }
+.info h1 i { font-style: italic; }
+.info .sub { font-size: 14px; line-height: 1.5; color: #6b6b60; margin-top: 12px; max-width: 480px; }
+.card { background: white; border: 1px solid #1a1a18; padding: 16px; margin-top: 20px; box-shadow: 4px 4px 0 #1a1a18; }
+.card h3 { font-size: 12px; font-family: ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.card pre { font-size: 11px; line-height: 1.5; background: #f6f3ec; padding: 12px; overflow-x: auto; font-family: ui-monospace, monospace; }
+.features { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #d6d2c7; border: 1px solid #d6d2c7; margin-top: 20px; }
+.feat { background: white; padding: 12px; }
+.feat b { font-size: 12px; display: block; margin-bottom: 2px; }
+.feat span { font-size: 11px; color: #6b6b60; }
+.warning { background: #1a1a18; color: #e8e2d5; padding: 12px 14px; font-size: 11px; line-height: 1.5; font-family: ui-monospace, monospace; margin-top: 20px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .phone { position: static; max-width: 380px; margin: 0 auto; } }
+</style>
+</head>
+<body>
+<div class="top"><div>Project 01 / WhatsApp AI Receptionist / Twilio + Calendar</div><div>Real dialog • TZ logged • Confirm-before-write</div></div>
+<div class="wrap">
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+      <div class="phone-header">
+        <div class="avatar">W</div>
+        <div><div style="font-size:13px; font-weight:600;">Wellness Studio</div><div style="font-size:11px; color:#6b6b60;">AI receptionist • online</div></div>
+        <div style="margin-left:auto; font-size:10px; font-family:ui-monospace,monospace; color:#8a867e;">Europe/Tallinn<br>09:00-18:00</div>
+      </div>
+      <div id="chat" class="chat">
+        <div class="msg system">Today • Conversation started • Sandbox: whatsapp:+14155238886<br>Send join code to connect — see README</div>
+        <div class="msg bot">Hello! I'm AI receptionist for Wellness Studio Tallinn. I can help you book, reschedule, or cancel appointments. Our hours are 09:00-18:00 Europe/Tallinn. What would you like to do?<div class="time">09:00 • Europe/Tallinn ✓✓</div></div>
+      </div>
+      <div class="quick">
+        <button onclick="quickMsg('Hi, I want to book wellness appointment tomorrow')">Book tomorrow</button>
+        <button onclick="quickMsg('11:00 works')">11:00</button>
+        <button onclick="quickMsg('Yes, confirm')">Yes ✓</button>
+      </div>
+      <div class="phone-input">
+        <input type="text" id="msgInput" placeholder="Type a message">
+        <button onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="info">
+    <h1>AI receptionist<br>that <i>books</i> —<br>not just chats.</h1>
+    <p class="sub">For European small business where WhatsApp is primary channel. Receives message, checks calendar availability, proposes slots with timezone, confirms before booking. Voice is roadmap, not fake-ready.</p>
+
+    <div class="warning">
+      SANDBOX LIMITATION: Demo uses Twilio Sandbox whatsapp:+14155238886 with join code, not real business number. Client must send join &lt;code&gt; to connect. Explicitly documented for interview — not hidden. Production needs WhatsApp Business API approval.
+    </div>
+
+    <div class="card">
+      <h3>How booking works — real flow</h3>
+      <pre>User: Hi, book tomorrow
+→ check_availability(date=2024-09-30, client_tz=Europe/Tallinn)
+Bot: 6 slots: 09:00, 11:00, 12:00 Europe/Tallinn. Which?
+User: 11:00 works
+→ pending booking stored
+Bot: Confirm: 2024-09-30 11:00-12:00 Europe/Tallinn for Anna. Yes?
+User: Yes
+→ book_slot(start_iso=2024-09-30T11:00:00+03:00, client_tz=Europe/Tallinn)
+Bot: ✅ Confirmed! Event ID mock_4 — appears in calendar
+
+Timezone logged: calendar=Europe/Tallinn, client=Europe/Tallinn
+Confirm-before-write: never books without explicit yes</pre>
+    </div>
+
+    <div class="features">
+      <div class="feat"><b>Confirm-before-write</b><span>Pending booking + explicit yes</span></div>
+      <div class="feat"><b>Timezone</b><span>Logs client TZ + calendar TZ</span></div>
+      <div class="feat"><b>Function calling</b><span>check_availability, book_slot</span></div>
+      <div class="feat"><b>Mock calendar</b><span>Works without Google creds</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Twilio sandbox setup</h3>
+      <pre>1. console.twilio.com → Messaging → WhatsApp sandbox
+2. Sandbox number: whatsapp:+14155238886
+3. Join code: join &lt;your-code&gt;
+4. From your WhatsApp, send join code to sandbox
+5. Webhook: https://your-ngrok-url/webhook/whatsapp
+6. Send message → agent replies
+
+For portfolio: sandbox sufficient, explicitly stated.</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+let userId='web_'+Math.random().toString(36).substr(2,9);
+async function sendMessage(){
+  const input=document.getElementById('msgInput'); const text=input.value.trim(); if(!text) return;
+  const chat=document.getElementById('chat');
+  const time=new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  chat.innerHTML+=`<div class="msg user">${text}<div class="time">${time} • You ✓✓</div></div>`;
+  input.value=''; chat.scrollTop=chat.scrollHeight;
+  try{
+    const resp=await fetch('/webhook/whatsapp/mock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({From:'whatsapp:+3725'+Math.floor(Math.random()*10000000),Body:text,ProfileName:'Web Demo',WaId:userId,client_timezone:'Europe/Tallinn'})});
+    const data=await resp.json();
+    let funcInfo=data.function_called?`<div style="font-size:10px; color:#8a867e; margin-top:6px; font-family:ui-monospace,monospace; border-top:1px dashed #e8e2d6; padding-top:4px;">↳ ${data.function_called}</div>`:'';
+    chat.innerHTML+=`<div class="msg bot">${data.response}${funcInfo}<div class="time">${time} • Europe/Tallinn</div></div>`;
+    chat.scrollTop=chat.scrollHeight;
+  }catch(e){ chat.innerHTML+=`<div class="msg bot">Error: ${e.message}</div>`; }
+}
+function quickMsg(t){ document.getElementById('msgInput').value=t; sendMessage(); }
+document.getElementById('msgInput').addEventListener('keypress', e=>{ if(e.key==='Enter') sendMessage(); });
+</script>
+</body>
+</html>
